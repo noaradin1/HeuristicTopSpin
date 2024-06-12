@@ -52,11 +52,12 @@ def BWAS(start, W, B, heuristic_function, T):
             return path_to_goal(nUB), expansions
 
         generated_states = [g[0] for g in generated]
-        heuristics = [heuristic_function([s]) for s in generated_states]
+        heuristics = heuristic_function(generated_states)
+        # heuristics = [heuristic_function([s]) for s in generated_states]
 
         for i in range(len(generated)):
             s, g, p = generated[i]
-            h = heuristics[i][0]
+            h = heuristics[i]
             f = g + W * h
             n_s = Node(state=s, g=g, p=p, f=f)
             heapq.heappush(OPEN, n_s)
