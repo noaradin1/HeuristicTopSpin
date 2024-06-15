@@ -8,13 +8,19 @@ import random
 def bellmanUpdateTraining(bellman_update_heuristic):
     # Parameters
     # TODO - how we get the batch size paramater if it is sent to BWAS instance
-    BATCH_SIZE = 50  # Assuming a batch size of 32
+    BATCH_SIZE = 1000  # Assuming a batch size of 32
+
     # TODO - do we control this paramater? perhaps because it influence the training time?
-    NUM_TRAINING_ITERATION = 20
-    for _ in range(NUM_TRAINING_ITERATION):
+    NUM_TRAINING_ITERATION = 300
+    MAX_MOVES = 30
+
+    for i in range(NUM_TRAINING_ITERATION):
+        print(f"starting iteration number {i}")
         # at every training iteration, a minibatch of random states is generated
-        minibatch = generate_random_states(n=bellman_update_heuristic._n, k=bellman_update_heuristic._k,
-                                           num_states=BATCH_SIZE, possible_actions=5)
+        # TODO - call noa's implemented method
+        base_ = BaseHeuristic(bellman_update_heuristic._n, bellman_update_heuristic._k)
+        minibatch = generate_random_states(n = bellman_update_heuristic._n, k=bellman_update_heuristic._k,
+        num_states= BATCH_SIZE , possible_actions=MAX_MOVES)
         training_labels = []
         for state in minibatch:
             # state.get_neighbors() - our implemented function
@@ -27,13 +33,17 @@ def bellmanUpdateTraining(bellman_update_heuristic):
                 if not neighbor.is_goal():
                     neighbor_cost += bellman_update_heuristic.get_h_values([neighbor])[0]
                 neighbors_costs.append(neighbor_cost)
-            training_labels.append(min(neighbors_costs))
+            label = min(neighbors_costs)
+            training_labels.append(label)
 
+        # Save the trained model
+        if i % 50 == 0:
+            bellman_update_heuristic.save_model()
+        print("training model...")
+        bellman_update_heuristic.train_model(minibatch, training_labels)
         # update heuristic after each batch
         # TODO - check when we need to update? do we decide this?
-        bellman_update_heuristic.train_model(minibatch, training_labels)
 
-    # Save the trained model
     bellman_update_heuristic.save_model()
 
 
