@@ -3,6 +3,7 @@ import heapq
 from topspin import TopSpinState
 from heuristics import *
 from heuristics import BaseHeuristic
+
 class Node:
     def __init__(self, state, g=0, p=None, f=0):
         self.state = state
@@ -11,7 +12,10 @@ class Node:
         self.f = f
 
     def __lt__(self, other):
+        if self.f == other.f:
+            return self.g > other.g
         return self.f < other.f
+
 
 def BWAS(start, W, B, heuristic_function, T):
     OPEN = []
@@ -44,7 +48,7 @@ def BWAS(start, W, B, heuristic_function, T):
 
             for neighbor, cost in n.state.get_neighbors():
                 new_g = n.g + cost
-                if neighbor not in CLOSED or new_g < CLOSED[neighbor].g:
+                if neighbor not in CLOSED or new_g < CLOSED[neighbor]:
                     CLOSED[neighbor] = new_g
                     generated.append((neighbor, new_g, n))
 
@@ -52,6 +56,9 @@ def BWAS(start, W, B, heuristic_function, T):
             return path_to_goal(nUB), expansions
 
         generated_states = [g[0] for g in generated]
+        if not generated_states:
+            continue
+
         heuristics = heuristic_function(generated_states)
         # heuristics = [heuristic_function([s]) for s in generated_states]
 
