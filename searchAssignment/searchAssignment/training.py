@@ -13,7 +13,6 @@ def bellmanUpdateTraining(bellman_update_heuristic):
     NUM_TRAINING_ITERATION = 20
     for _ in range(NUM_TRAINING_ITERATION):
         # at every training iteration, a minibatch of random states is generated
-        # TODO - call noa's implemented method
         minibatch = generate_random_states(n=bellman_update_heuristic._n, k=bellman_update_heuristic._k,
                                            num_states=BATCH_SIZE, possible_actions=5)
         training_labels = []
@@ -37,47 +36,25 @@ def bellmanUpdateTraining(bellman_update_heuristic):
     # Save the trained model
     bellman_update_heuristic.save_model()
 
-    for _ in range(NUM_TRAINING_ITERATION):
-        # at every training iteration, a minibatch of random states is generated
-        # TODO - call noa's implemented method
-        minibatch = generate_random_states(n = bellman_update_heuristic._n, k = bellman_update_heuristic._k, num_states = BATCH_SIZE, possible_actions=5)
-        training_labels = []
-        for state in minibatch:
-            # state.get_neighbors() - our implemented function
-            neighbors = state.get_neighbors()
-            neighbors_costs = []
-            for neighbor, cost in neighbors:
-                # TODO - use constant for 1
-                neighbor_cost = 1
-                # if neighbor is not goal we add the heuristic value, otherwise add 0 - according to formula
-                if not neighbor.is_goal():
-                    neighbor_cost += bellman_update_heuristic.get_h_values([neighbor])[0]
-                neighbors_costs.append(neighbor_cost)
-            training_labels.append(min(neighbors_costs))
-
-        # update heuristic after each batch
-        # TODO - check when we need to update? do we decide this?
-        bellman_update_heuristic.train_model(minibatch, training_labels)
-
-    # Save the trained model
-    bellman_update_heuristic.save_model()
 
 def bootstrappingTraining(bootstrapping_heuristic):
-    minibatch_size = 1000  # Assuming a batch size of 32
-    num_iterations = 10  # Number of training iterations
-    T = 1000  # Initial number of expansions allowed in BWA*
-    training_examples, training_outputs = [], []
-    for _ in range(num_iterations):
-        # Generate a minibatch of random states
-        random_states = generate_random_states(bootstrapping_heuristic._n, bootstrapping_heuristic._k, minibatch_size,
-                                               10)
-        # minibatch = [TopSpinState(state, bootstrapping_heuristic._k) for state in random_states]
+    BATCH_SIZE = 1000
+    NUM_TRAINING_ITERATION = 100
+    W_BWAS = 5
+    B_BWAS = 100
+    number_of_steps = 30 # initial
 
+    training_examples, training_outputs = [], []
+    for iteration in range(NUM_TRAINING_ITERATION):
+        print(f'iteration number {iteration}')
+        # Generate a minibatch of random states
+        random_states = generate_random_states(n=bootstrapping_heuristic._n, k=bootstrapping_heuristic._k,
+                                               num_states=BATCH_SIZE, possible_actions=number_of_steps)
         for state in random_states:
+            T = 1000  # Initial number of expansions allowed in BWA*
             while True:
                 # Run BWA* on the state
-                # base_heuristic = BaseHeuristic(11, 4)
-                path, num_expansions = BWAS(start=state, W=10.0, B=5,
+                path, num_expansions = BWAS(start=state, W=W_BWAS, B=B_BWAS,
                                             heuristic_function=bootstrapping_heuristic.get_h_values, T=T)
                 if path is not None:
                     # If BWA* finds a solution, add training examples
