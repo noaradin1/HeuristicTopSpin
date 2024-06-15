@@ -11,8 +11,6 @@ def bellmanUpdateTraining(bellman_update_heuristic):
     BATCH_SIZE = 50  # Assuming a batch size of 32
     # TODO - do we control this paramater? perhaps because it influence the training time?
     NUM_TRAINING_ITERATION = 20
-<<<<<<< HEAD
-
     for _ in range(NUM_TRAINING_ITERATION):
         # at every training iteration, a minibatch of random states is generated
         # TODO - call noa's implemented method
@@ -38,8 +36,6 @@ def bellmanUpdateTraining(bellman_update_heuristic):
 
     # Save the trained model
     bellman_update_heuristic.save_model()
-=======
->>>>>>> ebb60262ca942fb69fd5cf7cbad82ef7219472e0
 
     for _ in range(NUM_TRAINING_ITERATION):
         # at every training iteration, a minibatch of random states is generated
