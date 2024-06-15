@@ -5,6 +5,15 @@ class TopSpinState:
         self.state = state
         self.k = k
 
+    def __repr__(self):
+        return f"TopSpinState(state={self.state}, k={self.k})"
+
+    def __hash__(self):
+        return hash(tuple(self.state))
+
+    def __eq__(self, other):
+        return self.state == other.state and self.k == other.k
+
     def is_goal(self):
         return self.state == list(range(1, len(self.state) + 1))
 
