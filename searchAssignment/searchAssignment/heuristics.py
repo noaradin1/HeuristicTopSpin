@@ -68,18 +68,18 @@ class LearnedHeuristic:
 
         inputs_tensor = torch.tensor(inputs)
         outputs_tensor = torch.tensor(outputs).unsqueeze(1)  # Adding a dimension for the output
-
+        all_losses = []
         for epoch in range(epochs):
             self._model.train()
             self._optimizer.zero_grad()
 
             predictions = self._model(inputs_tensor)
             loss = self._criterion(predictions, outputs_tensor)
-            print(f"loss in epoch {epoch} is: {loss} :-)")
-
+            all_losses.append(loss.detach().item())
             loss.backward()
 
             self._optimizer.step()
+        print(f"loss is: {np.average(all_losses)} :-)")
 
     def save_model(self, path):
         torch.save(self._model.state_dict(), path)
