@@ -1,8 +1,10 @@
 from random import random
 from BWAS import *
 from topspin import TopSpinState
-from heuristics import *
+from heuristicsdca import *
 import random
+import numpy as np
+
 
 
 def bellmanUpdateTraining(bellman_update_heuristic):
@@ -11,16 +13,16 @@ def bellmanUpdateTraining(bellman_update_heuristic):
     BATCH_SIZE = 1000  # Assuming a batch size of 32
 
     # TODO - do we control this paramater? perhaps because it influence the training time?
-    NUM_TRAINING_ITERATION = 300
-    MAX_MOVES = 30
+    NUM_TRAINING_ITERATION = 150
+    MAX_MOVES = 100
 
     for i in range(NUM_TRAINING_ITERATION):
         print(f"starting iteration number {i}")
         # at every training iteration, a minibatch of random states is generated
         # TODO - call noa's implemented method
         base_ = BaseHeuristic(bellman_update_heuristic._n, bellman_update_heuristic._k)
-        minibatch = generate_random_states(n = bellman_update_heuristic._n, k=bellman_update_heuristic._k,
-        num_states= BATCH_SIZE , possible_actions=MAX_MOVES)
+        minibatch = generate_random_states(n=bellman_update_heuristic._n, k=bellman_update_heuristic._k,
+                                           num_states=BATCH_SIZE, possible_actions=MAX_MOVES)
         training_labels = []
         for state in minibatch:
             # state.get_neighbors() - our implemented function
@@ -41,6 +43,9 @@ def bellmanUpdateTraining(bellman_update_heuristic):
             bellman_update_heuristic.save_model()
         print("training model...")
         bellman_update_heuristic.train_model(minibatch, training_labels)
+        print(np.std(training_labels))
+        print(np.max(training_labels))
+
         # update heuristic after each batch
         # TODO - check when we need to update? do we decide this?
 
@@ -49,10 +54,10 @@ def bellmanUpdateTraining(bellman_update_heuristic):
 
 def bootstrappingTraining(bootstrapping_heuristic):
     BATCH_SIZE = 1000
-    NUM_TRAINING_ITERATION = 100
+    NUM_TRAINING_ITERATION = 50
     W_BWAS = 5
     B_BWAS = 100
-    number_of_steps = 30 # initial
+    number_of_steps = 100  # initial
 
     training_examples, training_outputs = [], []
     for iteration in range(NUM_TRAINING_ITERATION):
@@ -102,5 +107,3 @@ def generate_random_states(n, k, num_states, possible_actions):
         list_of_states.append(curr_state)
 
     return list_of_states
-
-# print(generate_random_states(4, 2,1,4))
