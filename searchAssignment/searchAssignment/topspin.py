@@ -1,11 +1,11 @@
 COST = 1
 class TopSpinState:
-
     def __init__(self, state, k=4):
         self.state = state
         self.k = k
 
     def __repr__(self):
+        # defines the string representation of State object
         return f"TopSpinState(state={self.state}, k={self.k})"
 
     def __hash__(self):
@@ -15,6 +15,7 @@ class TopSpinState:
         return self.state == other.state and self.k == other.k
 
     def is_goal(self):
+        # returns true if the list of integers that represent the states is sorted.
         return self.state == list(range(1, len(self.state) + 1))
 
 
@@ -42,32 +43,13 @@ class TopSpinState:
 
     def get_neighbors(self):
         neighbors = []
-
+        # neighbors from first action - clockwise-state
         clockwise_state = self.preform_clockwise_state()
         neighbors.append((TopSpinState(state=clockwise_state, k=self.k), COST))
-
+        # neighbors from first action - counterclouckwise-state
         preform_counterclockwise_state = self.preform_counterclockwise_state()
         neighbors.append((TopSpinState(state=preform_counterclockwise_state, k=self.k), COST))
-
+        # neighbors from 3rd action - flipped-state
         preform_flipped_state = self.preform_flipped_state()
         neighbors.append((TopSpinState(state=preform_flipped_state, k=self.k), COST))
-
         return neighbors
-
-if __name__ == "__main__":
-    initial_state = TopSpinState([1, 2, 3], 2)
-    print("Initial State:", initial_state)
-    print("Is goal:", initial_state.is_goal())
-    print("State as list:", initial_state.get_state_as_list())
-
-    print("\nNeighbors:")
-    for action in initial_state.get_neighbors():
-        print(f"action: {action}, neighbors: {action[0].state}")
-
-    # # Demonstrating the equality function
-    # same_state = TopSpinState([3, 2, 1], 2)
-    # different_state = TopSpinState([1, 2, 3], 2)
-    #
-    # print("\nEquality checks:")
-    # print(f"Initial state == Same state: {initial_state == same_state}")
-    # print(f"Initial state == Different state: {initial_state == different_state}")
